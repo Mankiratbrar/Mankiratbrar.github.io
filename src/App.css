@@ -1,0 +1,175 @@
+#root {
+  width: min(100% - 2rem, 760px);
+  margin: 0 auto;
+  padding: 5rem 0;
+}
+
+textarea,input {
+  box-sizing: border-box;
+  width: calc(50% - 0.5rem);
+  min-height: 3.25rem;
+  margin: 0 0.5rem 1rem 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid #293449;
+  border-radius: 12px;
+  outline: none;
+  background: #101827;
+  color: #e5e7eb;
+  font: inherit;
+  box-shadow: 0 2px 5px rgb(0 0 0 / 18%);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+textarea::placeholder,input::placeholder {
+  color: #8490a5;
+}
+
+textarea:focus,input:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 4px rgb(129 140 248 / 16%);
+}
+
+textarea[name="content"] {
+  width: 100%;
+  min-height: 14rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.95rem;
+}
+
+button {
+  min-height: 2.65rem;
+  padding: 0.65rem 1rem;
+  border: 0;
+  border-radius: 10px;
+  background: #6366f1;
+  color: white;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgb(99 102 241 / 20%);
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+button:hover {
+  background: #5558e8;
+  transform: translateY(-1px);
+}
+
+button:focus-visible {
+  outline: 3px solid rgb(129 140 248 / 55%);
+  outline-offset: 3px;
+}
+
+#root > button {
+  min-height: 3.25rem;
+  padding-inline: 1.4rem;
+}
+
+.pastedContainer {
+  margin-top: 1rem;
+  padding: 1.35rem 1.5rem;
+  border: 1px solid #202b3d;
+  border-radius: 16px;
+  background: rgb(15 22 35 / 92%);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 22%);
+}
+
+.pastedContainer h1 {
+  margin: 0 0 1.25rem;
+  color: #f3f4f6;
+}
+
+.pasteCard {
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid #263247;
+  border-radius: 12px;
+  background: #0c1320;
+}
+
+.pasteCard p {
+  margin: 0 0 0.75rem;
+  overflow-wrap: anywhere;
+  line-height: 1.55;
+}
+
+.pasteCard p:first-of-type {
+  margin-bottom: 0.5rem;
+  color: #e5e7eb;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.pasteCard p:nth-of-type(2),
+.pasteCard p:nth-of-type(3) {
+  color: #a6b0c2;
+}
+
+.pasteCard p:last-of-type {
+  display: inline-block;
+  margin: 0.2rem 0 0;
+  color: #77849a;
+  font-size: 0.72rem;
+}
+
+.pasteCard button {
+  min-height: 2.25rem;
+  margin: 0.25rem 0.5rem 0 0;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.875rem;
+  box-shadow: none;
+}
+
+.pasteCard button:first-of-type {
+  background: #3a1f2a;
+  color: #fda4af;
+}
+
+.pasteCard button:first-of-type:hover {
+  background: #4b2633;
+}
+
+.pasteCard button:last-of-type {
+  background: #24274a;
+  color: #a5b4fc;
+}
+
+.pasteCard button:last-of-type:hover {
+  background: #30345b;
+}
+
+.noPaste h2 {
+  color: #e5e7eb;
+}
+
+.noPaste p {
+  color: #a6b0c2;
+}
+
+@media (max-width: 560px) {
+  #root {
+    width: min(100% - 1.5rem, 760px);
+    padding: 2rem 0;
+  }
+
+  input {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .pastedContainer {
+    padding: 1.1rem;
+  }
+
+  .pasteCard {
+    padding: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
