@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
 
+const PREVIEW_OPEN_MS = 280
+const PREVIEW_CLOSE_MS = 280
+
 function App() {
   const [pastes, setPastes] = useState(() => {
     const saved = localStorage.getItem('pastes')
@@ -8,9 +11,26 @@ function App() {
   })
   const [editingId, setEditingId] = useState(null)
   const [viewingPaste, setViewingPaste] = useState(null)
+  const [isOpeningPreview, setIsOpeningPreview] = useState(false)
+  const [isClosingPreview, setIsClosingPreview] = useState(false)
+  const [openMotion, setOpenMotion] = useState({ x: 0, y: 0, scale: 0.3, rotate: 0 })
+  const [closeMotion, setCloseMotion] = useState({ x: 0, y: 0, scale: 0.3, rotate: 0 })
   const [searchParams, setSearchParams] = useState('')
   const titleRef = useRef(null)
   const contentRef = useRef(null)
+  const cardRefs = useRef(new Map())
+  const previewRef = useRef(null)
+  const openTimerRef = useRef(null)
+  const closeTimerRef = useRef(null)
+
+  const setCardRef = (id, node) => {
+    if (node) {
+      cardRefs.current.set(id, node)
+      return
+    }
+
+    cardRefs.current.delete(id)
+  }
 
   const savePaste = () => {
     const title = titleRef.current.value
@@ -35,6 +55,10 @@ function App() {
 
   const deletePaste = deleteId => {
     if (viewingPaste?.id === deleteId) {
+      clearTimeout(openTimerRef.current)
+      clearTimeout(closeTimerRef.current)
+      setIsOpeningPreview(false)
+      setIsClosingPreview(false)
       setViewingPaste(null)
     }
     setPastes(current => current.filter(item => item.id !== deleteId))
@@ -54,11 +78,75 @@ function App() {
   }
 
   const openPreview = paste => {
+    const cardEl = cardRefs.current.get(paste.id)
+
+    clearTimeout(openTimerRef.current)
+    clearTimeout(closeTimerRef.current)
+    setIsClosingPreview(false)
+
+    if (!cardEl) {
+      setViewingPaste(paste)
+      setIsOpeningPreview(false)
+      return
+    }
+
+    const cardRect = cardEl.getBoundingClientRect()
+    const viewportCenterX = window.innerWidth / 2
+    const viewportCenterY = window.innerHeight / 2
+    const estimatedModalWidth = Math.min(760, Math.max(320, window.innerWidth - 32))
+    const fromScale = Math.max(0.22, Math.min(0.5, cardRect.width / estimatedModalWidth))
+
+    setOpenMotion({
+      x: cardRect.left + cardRect.width / 2 - viewportCenterX,
+      y: cardRect.top + cardRect.height / 2 - viewportCenterY,
+      scale: fromScale,
+      rotate: cardRect.left + cardRect.width / 2 < viewportCenterX ? -4 : 4
+    })
+
     setViewingPaste(paste)
+    setIsOpeningPreview(true)
+
+    openTimerRef.current = setTimeout(() => {
+      setIsOpeningPreview(false)
+    }, PREVIEW_OPEN_MS)
   }
 
   const closePreview = () => {
-    setViewingPaste(null)
+    if (!viewingPaste || isClosingPreview) {
+      return
+    }
+
+    const previewEl = previewRef.current
+    const cardEl = cardRefs.current.get(viewingPaste.id)
+
+    if (!previewEl || !cardEl) {
+      setViewingPaste(null)
+      return
+    }
+
+    const previewRect = previewEl.getBoundingClientRect()
+    const cardRect = cardEl.getBoundingClientRect()
+    const previewCenterX = previewRect.left + previewRect.width / 2
+    const previewCenterY = previewRect.top + previewRect.height / 2
+    const cardCenterX = cardRect.left + cardRect.width / 2
+    const cardCenterY = cardRect.top + cardRect.height / 2
+    const targetScale = Math.max(0.22, Math.min(0.5, cardRect.width / previewRect.width))
+
+    setCloseMotion({
+      x: cardCenterX - previewCenterX,
+      y: cardCenterY - previewCenterY,
+      scale: targetScale,
+      rotate: cardCenterX < previewCenterX ? -4 : 4
+    })
+    setIsClosingPreview(true)
+    setIsOpeningPreview(false)
+
+    clearTimeout(openTimerRef.current)
+    clearTimeout(closeTimerRef.current)
+    closeTimerRef.current = setTimeout(() => {
+      setViewingPaste(null)
+      setIsClosingPreview(false)
+    }, PREVIEW_CLOSE_MS)
   }
 
   useEffect(() => {
@@ -68,13 +156,21 @@ function App() {
 
     const onKeyDown = event => {
       if (event.key === 'Escape') {
-        setViewingPaste(null)
+        closePreview()
       }
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [viewingPaste])
+  }, [viewingPaste, isClosingPreview])
+
+  useEffect(
+    () => () => {
+      clearTimeout(openTimerRef.current)
+      clearTimeout(closeTimerRef.current)
+    },
+    []
+  )
 
   const filtered = pastes.filter(paste =>
     paste.title.toLowerCase().includes(searchParams.toLowerCase())
@@ -156,6 +252,7 @@ function App() {
                 <li
                   className={`paste-card ${editingId === paste.id ? 'is-active' : ''}`}
                   key={paste.id}
+                  ref={node => setCardRef(paste.id, node)}
                   style={{ '--delay': `${index * 60}ms` }}
                 >
                   <div className="card-top">
@@ -212,12 +309,26 @@ function App() {
       </main>
 
       {viewingPaste && (
-        <div className="preview-backdrop" onClick={closePreview}>
+        <div
+          className={`preview-backdrop ${isClosingPreview ? 'is-closing' : ''}`}
+          onClick={closePreview}
+        >
           <section
-            className="preview-modal"
+            className={`preview-modal ${isOpeningPreview ? 'is-opening' : ''} ${isClosingPreview ? 'is-closing' : ''}`}
             role="dialog"
             aria-modal="true"
             aria-labelledby="preview-title"
+            ref={previewRef}
+            style={{
+              '--preview-from-x': `${openMotion.x}px`,
+              '--preview-from-y': `${openMotion.y}px`,
+              '--preview-from-scale': openMotion.scale,
+              '--preview-from-rotate': `${openMotion.rotate}deg`,
+              '--preview-to-x': `${closeMotion.x}px`,
+              '--preview-to-y': `${closeMotion.y}px`,
+              '--preview-to-scale': closeMotion.scale,
+              '--preview-to-rotate': `${closeMotion.rotate}deg`
+            }}
             onClick={event => event.stopPropagation()}
           >
             <div className="preview-head">

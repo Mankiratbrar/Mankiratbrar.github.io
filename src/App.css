@@ -499,6 +499,10 @@
   backdrop-filter: blur(2px);
 }
 
+.preview-backdrop.is-closing {
+  animation: preview-backdrop-out 280ms ease forwards;
+}
+
 .preview-modal {
   width: min(100%, 760px);
   max-height: min(88vh, 760px);
@@ -510,6 +514,54 @@
   border-radius: var(--wobble-lg);
   background: var(--card);
   box-shadow: 8px 8px 0 var(--ink);
+}
+
+.preview-modal.is-opening {
+  animation: preview-grow-from-card 280ms cubic-bezier(0.2, 0.75, 0.2, 1) both;
+  transform-origin: center;
+}
+
+.preview-modal.is-closing {
+  animation: preview-drop-to-card 280ms cubic-bezier(0.22, 0.8, 0.24, 1) forwards;
+  transform-origin: center;
+  pointer-events: none;
+}
+
+@keyframes preview-grow-from-card {
+  0% {
+    opacity: 0;
+    transform: translate3d(var(--preview-from-x), var(--preview-from-y), 0)
+      scale(var(--preview-from-scale)) rotate(var(--preview-from-rotate));
+    filter: blur(0.6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    filter: blur(0);
+  }
+}
+
+@keyframes preview-drop-to-card {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--preview-to-x), var(--preview-to-y), 0)
+      scale(var(--preview-to-scale)) rotate(var(--preview-to-rotate));
+    filter: blur(0.6px);
+  }
+}
+
+@keyframes preview-backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 .preview-head,
