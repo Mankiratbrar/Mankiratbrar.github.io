@@ -55,12 +55,6 @@ function App() {
 
   return (
     <div className="app">
-      <div className="ambient" aria-hidden="true">
-        <span className="orb orb-a" />
-        <span className="orb orb-b" />
-        <span className="grid-overlay" />
-      </div>
-
       <main className="shell">
         <header className="masthead">
           <div className="brand">
