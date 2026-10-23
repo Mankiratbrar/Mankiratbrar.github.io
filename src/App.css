@@ -67,18 +67,18 @@
 }
 
 @media (min-width: 980px) {
-  .shell {
-    grid-template-columns: minmax(320px, 400px) 1fr;
+  .containerMain {
+    grid-template-columns: max-content minmax(0, 1fr);
     align-items: start;
   }
 
-  .masthead {
-    grid-column: 1 / -1;
-  }
-
-  .composer {
+  .containerMain .composer {
     position: sticky;
     top: 2rem;
+  }
+
+  .containerMain .field-code {
+    width: 400px;
   }
 }
 
@@ -145,8 +145,11 @@
     opacity: 0.35;
   }
 }
-.containerMain{
-  display: flex;
+.containerMain {
+  display: grid;
+  gap: 1.5rem;
+
+  
 }
 
 .composer,
@@ -232,7 +235,7 @@
 
 .field-code {
   min-height: 15rem;
-  resize: vertical;
+  resize: both;
   font-family: var(--font-mono);
   font-size: 0.9rem;
   line-height: 1.6;
@@ -321,6 +324,11 @@
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 1.25rem;
+}
+
+.library {
+  min-width: 320px;
+  min-height: 28rem;
 }
 
 .library-title {
