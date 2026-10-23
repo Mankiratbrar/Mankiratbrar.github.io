@@ -260,6 +260,25 @@
     color 120ms ease;
 }
 
+.view-btn {
+  min-height: 2.2rem;
+  padding: 0.25rem 0.8rem;
+  border: 2px solid var(--marker-blue);
+  border-radius: var(--wobble-sm);
+  background: #e5f4ff;
+  color: #095da3;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.view-btn:hover {
+  background: var(--marker-blue);
+  color: #fff;
+}
+
 .ghost-btn:hover {
   background: var(--marker-yellow);
   color: var(--ink);
@@ -465,7 +484,72 @@
 
 .card-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.4rem;
+}
+
+.preview-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--ink) 48%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+.preview-modal {
+  width: min(100%, 760px);
+  max-height: min(88vh, 760px);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.3rem;
+  border: 2px solid var(--ink);
+  border-radius: var(--wobble-lg);
+  background: var(--card);
+  box-shadow: 8px 8px 0 var(--ink);
+}
+
+.preview-head,
+.preview-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.preview-head h2 {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-title);
+  font-size: 1.75rem;
+  color: var(--ink);
+}
+
+.preview-body {
+  margin: 0;
+  padding: 0.9rem;
+  overflow: auto;
+  border: 2px dashed var(--ink-faint);
+  border-radius: var(--wobble-sm);
+  background: #fff;
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.preview-foot {
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
 }
 
 .empty {
@@ -563,7 +647,8 @@
   }
 
   .ghost-btn,
-  .danger-btn {
+  .danger-btn,
+  .view-btn {
     font-size: 1rem;
   }
 
@@ -650,8 +735,25 @@
     width: 100%;
   }
 
+  .preview-head,
+  .preview-foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .preview-head h2 {
+    font-size: 1.45rem;
+    white-space: normal;
+  }
+
+  .preview-head .ghost-btn,
+  .preview-foot .view-btn {
+    width: 100%;
+  }
+
   .card-actions .ghost-btn,
-  .card-actions .danger-btn {
+  .card-actions .danger-btn,
+  .card-actions .view-btn {
     flex: 1;
   }
 }

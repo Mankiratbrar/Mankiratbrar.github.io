@@ -7,6 +7,7 @@ function App() {
     return saved ? JSON.parse(saved) : []
   })
   const [editingId, setEditingId] = useState(null)
+  const [viewingPaste, setViewingPaste] = useState(null)
   const [searchParams, setSearchParams] = useState('')
   const titleRef = useRef(null)
   const contentRef = useRef(null)
@@ -33,6 +34,9 @@ function App() {
   }, [pastes])
 
   const deletePaste = deleteId => {
+    if (viewingPaste?.id === deleteId) {
+      setViewingPaste(null)
+    }
     setPastes(current => current.filter(item => item.id !== deleteId))
   }
 
@@ -48,6 +52,29 @@ function App() {
     titleRef.current.value = ''
     contentRef.current.value = ''
   }
+
+  const openPreview = paste => {
+    setViewingPaste(paste)
+  }
+
+  const closePreview = () => {
+    setViewingPaste(null)
+  }
+
+  useEffect(() => {
+    if (!viewingPaste) {
+      return
+    }
+
+    const onKeyDown = event => {
+      if (event.key === 'Escape') {
+        setViewingPaste(null)
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [viewingPaste])
 
   const filtered = pastes.filter(paste =>
     paste.title.toLowerCase().includes(searchParams.toLowerCase())
@@ -141,6 +168,13 @@ function App() {
                     <div className="card-actions">
                       <button
                         type="button"
+                        className="view-btn"
+                        onClick={() => openPreview(paste)}
+                      >
+                        View
+                      </button>
+                      <button
+                        type="button"
                         className="ghost-btn"
                         onClick={() => editPaste(paste.title, paste.content, paste.id)}
                       >
@@ -176,6 +210,41 @@ function App() {
         </section>
         </div>
       </main>
+
+      {viewingPaste && (
+        <div className="preview-backdrop" onClick={closePreview}>
+          <section
+            className="preview-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="preview-title"
+            onClick={event => event.stopPropagation()}
+          >
+            <div className="preview-head">
+              <h2 id="preview-title">{viewingPaste.title || 'Untitled snippet'}</h2>
+              <button type="button" className="ghost-btn" onClick={closePreview}>
+                Close
+              </button>
+            </div>
+
+            <pre className="preview-body">{viewingPaste.content || 'No snippet content.'}</pre>
+
+            <div className="preview-foot">
+              <span>{viewingPaste.id.slice(0, 8)}</span>
+              <button
+                type="button"
+                className="view-btn"
+                onClick={() => {
+                  editPaste(viewingPaste.title, viewingPaste.content, viewingPaste.id)
+                  closePreview()
+                }}
+              >
+                Edit this snippet
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   )
 }
