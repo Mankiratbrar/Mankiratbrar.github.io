@@ -43,12 +43,41 @@
 }
 
 .brand-mark {
-  width: 1.2rem;
-  height: 1.2rem;
+  position: relative;
+  flex: none;
+  width: 1.35rem;
+  height: 1.35rem;
   border: 2px solid var(--ink);
-  border-radius: var(--wobble-sm);
+  border-radius: 0.28rem;
   background: var(--marker-yellow);
-  transform: rotate(-8deg);
+  box-shadow: 2px 2px 0 var(--ink);
+  transform: rotate(-7deg);
+}
+
+.brand-mark::before {
+  content: '';
+  position: absolute;
+  top: -0.34rem;
+  left: 0.08rem;
+  width: 0.88rem;
+  height: 0.42rem;
+  border: 2px solid var(--ink);
+  border-radius: 0.2rem;
+  background: var(--marker-blue);
+  transform: rotate(-10deg);
+}
+
+.brand-mark::after {
+  content: '';
+  position: absolute;
+  right: 0.06rem;
+  bottom: 0.06rem;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-top: 2px solid var(--ink);
+  border-left: 2px solid var(--ink);
+  background: #fff7c8;
+  transform: rotate(45deg);
 }
 
 .brand-name {
