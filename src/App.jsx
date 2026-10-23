@@ -72,7 +72,7 @@ function App() {
             <span>{pastes.length} {pastes.length === 1 ? 'snippet' : 'snippets'} stored</span>
           </div>
         </header>
-
+    <div className='containerMain'>
         <section className={`composer ${editingId ? 'is-editing' : ''}`}>
           <div className="composer-head">
             <span className="composer-label">
@@ -180,6 +180,7 @@ function App() {
             </div>
           )}
         </section>
+        </div>
       </main>
     </div>
   )

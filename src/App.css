@@ -145,6 +145,9 @@
     opacity: 0.35;
   }
 }
+.containerMain{
+  display: flex;
+}
 
 .composer,
 .library {
