@@ -80,6 +80,10 @@
   .containerMain .field-code {
     width: 400px;
   }
+
+  .library {
+    min-width: 320px;
+  }
 }
 
 .masthead {
@@ -147,6 +151,7 @@
 }
 .containerMain {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 1.5rem;
 
   
@@ -327,7 +332,6 @@
 }
 
 .library {
-  min-width: 320px;
   min-height: 28rem;
 }
 
@@ -593,9 +597,20 @@
 
   .search {
     max-width: none;
+    flex: none;
+  }
+
+  .field-code {
+    resize: vertical;
   }
 
   .paste-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .composer,
+  .library {
+    min-width: 0;
+    min-height: 0;
   }
 }
