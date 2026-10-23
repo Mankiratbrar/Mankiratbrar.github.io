@@ -33,8 +33,14 @@ function App() {
   }
 
   const savePaste = () => {
-    const title = titleRef.current.value
+    const title = titleRef.current.value.trim()
     const content = contentRef.current.value
+
+    if (!title) {
+      titleRef.current.focus()
+      return
+    }
+
     if (editingId) {
       setPastes(current =>
         current.map(paste =>
@@ -43,6 +49,7 @@ function App() {
       )
       setEditingId(null)
     } else {
+      
       setPastes(prev => [...prev, { title, content, id: crypto.randomUUID() }])
     }
     titleRef.current.value = ''
