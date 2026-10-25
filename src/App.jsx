@@ -1,14 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
+import axios from 'axios'
 
 const PREVIEW_OPEN_MS = 280
 const PREVIEW_CLOSE_MS = 280
 
 function App() {
-  const [pastes, setPastes] = useState(() => {
-    const saved = localStorage.getItem('pastes')
-    return saved ? JSON.parse(saved) : []
-  })
+  const [pastes, setPastes] = useState([])
   const [editingId, setEditingId] = useState(null)
   const [viewingPaste, setViewingPaste] = useState(null)
   const [isOpeningPreview, setIsOpeningPreview] = useState(false)
@@ -23,6 +21,12 @@ function App() {
   const openTimerRef = useRef(null)
   const closeTimerRef = useRef(null)
 
+  const normalizePaste = paste => ({
+    id: paste?._id ?? paste?.id,
+    title: paste?.title ?? '',
+    content: paste?.content ?? ''
+  })
+
   const setCardRef = (id, node) => {
     if (node) {
       cardRefs.current.set(id, node)
@@ -32,7 +36,7 @@ function App() {
     cardRefs.current.delete(id)
   }
 
-  const savePaste = () => {
+  const savePaste = async () => {
     const title = titleRef.current.value.trim()
     const content = contentRef.current.value
 
@@ -42,25 +46,69 @@ function App() {
     }
 
     if (editingId) {
+      const prev = pastes
       setPastes(current =>
         current.map(paste =>
           paste.id === editingId ? { ...paste, title, content } : paste
         )
       )
+
+      try {
+        const { data } = await axios.put(`/api/editCard/${editingId}`, { title, content })
+        const updated = normalizePaste(data?.updatedProduct ?? data)
+        if (updated?.id) {
+          setPastes(current => current.map(paste => (paste.id === editingId ? updated : paste)))
+        }
+      } catch {
+        setPastes(prev)
+        return
+      }
+
       setEditingId(null)
     } else {
-      
-      setPastes(prev => [...prev, { title, content, id: crypto.randomUUID() }])
+      try {
+        const { data } = await axios.post('/api/postCard', { title, content })
+        const created = normalizePaste(data?.newProduct ?? data)
+        if (created?.id) {
+          setPastes(prev => [...prev, created])
+        }
+      } catch {
+        return
+      }
     }
     titleRef.current.value = ''
     contentRef.current.value = ''
   }
 
   useEffect(() => {
-    localStorage.setItem('pastes', JSON.stringify(pastes))
-  }, [pastes])
+    let cancelled = false
 
-  const deletePaste = deleteId => {
+    const loadPastes = async () => {
+      try {
+        const { data } = await axios.get('/api/getCard')
+        const items = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.products)
+            ? data.products
+            : []
+
+        if (!cancelled) {
+          setPastes(items.map(normalizePaste).filter(paste => paste.id))
+        }
+      } catch {
+        if (!cancelled) {
+          setPastes([])
+        }
+      }
+    }
+
+    loadPastes()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const deletePaste = async deleteId => {
     if (viewingPaste?.id === deleteId) {
       clearTimeout(openTimerRef.current)
       clearTimeout(closeTimerRef.current)
@@ -68,7 +116,14 @@ function App() {
       setIsClosingPreview(false)
       setViewingPaste(null)
     }
+    const prev = pastes
     setPastes(current => current.filter(item => item.id !== deleteId))
+
+    try {
+      await axios.delete(`/api/deleteCard/${deleteId}`)
+    } catch {
+      setPastes(prev)
+    }
   }
 
   const editPaste = (title, content, id) => {
