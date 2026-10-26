@@ -280,7 +280,7 @@ function App() {
           />
 
           <div className="composer-foot">
-            <span className="hint">Saved locally in this browser</span>
+            <span className="hint">Saved in a Unified Database</span>
             <button type="button" className="primary-btn" onClick={savePaste}>
               <span>{editingId ? 'Update' : 'Save snippet'}</span>
               <span className="btn-glyph" aria-hidden="true">→</span>
